@@ -26,6 +26,10 @@ var params = {
 var action = process.argv[2];
 var value = process.argv[3];
 
+//omdb query URL
+var queryUrl = "http://www.omdbapi.com/?t=" + value + "&y=&plot=short&apikey=40e9cece";
+var rottenTomatoesURL = "https://www.rottentomatoes.com/search/?search=" + value;
+
 //switch-case statement for each argument to determine which function to run
 switch (action) {
   case "my-tweets":
@@ -69,12 +73,38 @@ function showTweets(){
 
 //function to show song info (read instructions)
 function showSongInfo(){
-	console.log("show song info function working")
+		console.log("show song info function working");
 }
 
 //function to call movie info
 function showMovieInfo(){
-	console.log("show movie info function working")
+	//console.log("show movie info function working");
+	if (value){
+		request(queryUrl, function(error, response, body){
+	   	if (!error && response.statusCode === 200) {
+		   	console.log("Movie Title: " + JSON.parse(body).Title);
+		   	console.log("Release Year: " + JSON.parse(body).Year);
+		   	console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+		   	console.log("Produced In: " + JSON.parse(body).Country);
+		   	console.log("Movie Language: " + JSON.parse(body).Language);
+		   	console.log("Movie Plot: " + JSON.parse(body).Plot);
+		   	console.log("Actors and Actresses: " + JSON.parse(body).Actors);
+		   	console.log("Rotten Tomatoes URL: " + rottenTomatoesURL);
+	 		}
+		});
+	} else {
+		queryUrl = "http://www.omdbapi.com/?t=mr+nobody+&y=&plot=short&apikey=40e9cece";
+		request(queryUrl, function(error, response, body){
+	   	console.log("Movie Title: " + JSON.parse(body).Title);
+	   	console.log("Release Year: " + JSON.parse(body).Year);
+	   	console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+	   	console.log("Produced In: " + JSON.parse(body).Country);
+	   	console.log("Movie Language: " + JSON.parse(body).Language);
+	   	console.log("Movie Plot: " + JSON.parse(body).Plot);
+	   	console.log("Actors and Actresses: " + JSON.parse(body).Actors);
+	   	console.log("Rotten Tomatoes URL: " + rottenTomatoesURL);
+		});
+	}	
 }
 //function to take the text inside of random.txt and use it to call one of LIRI's commands
 //whatItSays
