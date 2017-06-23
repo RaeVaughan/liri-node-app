@@ -51,22 +51,19 @@ switch (action) {
 
 //function to show last 20 tweets and when they were created in terminal
 function showTweets(){
-	console.log("tweet function working");
 	
 	client.get("statuses/user_timeline", params.twitterParams, function(error, tweets, response) {
 	  if (!error && response.statusCode === 200) {
-	  	console.log(tweets);
-	  	// for (var i = 0; i < tweets.length; i++){
-	  	// 	// var tweet = tweets[i].text;
-	  	// 	// var tweetDate = tweets[i].created_at;
-	  	// 	// console.log(tweet);
-	  	// 	// console.log("Date Posted: " + tweetDate);
-	  	// 	// console.log("============================");
-	  	// }
+	  	 for (var i = 0; i < tweets.length; i++){
+	  	 	 var tweet = tweets[i].text;
+	  	 	 var tweetDate = tweets[i].created_at;
+	  		 console.log(tweet);
+	  		 console.log("Date Posted: " + tweetDate);
+	  		 console.log("============================");
+	  	 }
 	  } else {
-	  console.log(error);  
+	  return console.log(error);  
 		}
-	  //console.log(response); 
 	});
 }
 
