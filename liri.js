@@ -15,7 +15,7 @@ var spotify = new Spotify(keys.spotifyKeys);
 var action = process.argv[2];
 var value = process.argv[3];
 
-//parameters
+//twitter and spotify parameters
 var params = {
     twitterParams: {
         screen_name: 'rachel_ut_test'
@@ -34,29 +34,27 @@ var rottenTomatoesURL = "https://www.rottentomatoes.com/search/?search=" + value
 switch (action) {
   case "my-tweets":
     showTweets();
-    //console.log("my-tweets");
     break;
 
   case "spotify-this-song":
     showSongInfo();
-    //console.log("spotify-this-song");
     break;
 
   case "movie-this":
     showMovieInfo();
-    //console.log("movie-this");
     break;
 
   case "do-what-it-says":
     whatItSays();
-    //console.log("do-what-it-says");
     break;
 }
 
-//function to show last 20 tweets and when they were created in terminal
+//function to show tweets and when they were created in terminal
 function showTweets(){
 	
+	//get user timeline statuses of the client user twitter parameters defined above
 	client.get("statuses/user_timeline", params.twitterParams, function(error, tweets, response) {
+		//if there's no error, loop through the tweets, store tweets and tweet dates as variables, and log them in terminal
 	  if (!error && response.statusCode === 200) {
 	  	 for (var i = 0; i < tweets.length; i++){
 	  	 	 var tweet = tweets[i].text;
@@ -71,28 +69,30 @@ function showTweets(){
 	});
 }
 
-//function to show song info (read instructions)
+//function to show song info
 function showSongInfo(){
-		//console.log("show song info function working");
+		//if there is no song input (undefined), then set song to Bohemian Rhapsody
 	if (params.spotifyParams.query === undefined){
 		params.spotifyParams.query = "Bohemian Rhapsody";
 	}
 
 	spotify.search(params.spotifyParams, function(err, data) {
-	  
-	  if (value !== undefined) {
+	  //if there is a value (song name input):
+	  if (value) {
+	  	//splice and join everything after the command (spotify-this-song) in order to handle songs with more than one word
 			value = process.argv.splice(3).join(" ");
 			query = value;
 
-			//console.log(value);
-			//console.log(query);
+			//log the information of the song that was input
 	  	console.log("Artist: " + data.tracks.items[0].artists[0].name);
 	  	console.log("Song Name: " + data.tracks.items[0].name);
 	  	console.log("Preview Link: " + data.tracks.items[0].href);
 	  	console.log("Album: " + data.tracks.items[0].album.name);
 	  } else if (err) {
+	  	//if there is an error, log it
 	  	return console.log('Error occurred: ' + err);
 	  } else {
+	  	//logging the information of Bohemian Rhapsody if there is no song input and there is no error
 	  	console.log("Artist: " + data.tracks.items[0].artists[0].name);
 	  	console.log("Song Name: " + data.tracks.items[0].name);
 	  	console.log("Preview Link: " + data.tracks.items[0].href);
@@ -103,9 +103,10 @@ function showSongInfo(){
 
 //function to call movie info
 function showMovieInfo(){
-	//console.log("show movie info function working");
+	//if there is a value, do this:
 	if (value){
 		request(queryUrl, function(error, response, body){
+			//if there is no error, log this info for value (the song that was input)
 	   	if (!error && response.statusCode === 200) {
 		   	console.log("Movie Title: " + JSON.parse(body).Title);
 		   	console.log("Release Year: " + JSON.parse(body).Year);
@@ -117,7 +118,9 @@ function showMovieInfo(){
 		   	console.log("Rotten Tomatoes URL: " + rottenTomatoesURL);
 	 		}
 		});
+		//if there is not a value, log the information for Mr. Nobody
 	} else {
+		//set query URL to the URL for Mr. Nobody
 		queryUrl = "http://www.omdbapi.com/?t=mr+nobody+&y=&plot=short&apikey=40e9cece";
 		request(queryUrl, function(error, response, body){
 	   	console.log("Movie Title: " + JSON.parse(body).Title);
@@ -129,19 +132,15 @@ function showMovieInfo(){
 	   	console.log("Actors and Actresses: " + JSON.parse(body).Actors);
 	   	console.log("Rotten Tomatoes URL: " + rottenTomatoesURL);
 		});
-	}	
+	}
 }
 //function to take the text inside of random.txt and use it to call one of LIRI's commands
 function whatItSays(){
 	fs.readFile("random.txt", "utf8", function(error, data){
-
+		//if there is an error, log it; if not, run the showSongInfo function
 		if(error) {
 		  console.log("Something went wrong" + error);
 		}
-		//var dataArr = data.split(",");
-		//console.log(dataArr);
-		//value = dataArr[1];
-		//console.log(value);
 		showSongInfo();
     });
 }
