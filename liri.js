@@ -5,28 +5,28 @@ var keys = require("./keys.js");
 var request = require("request")
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
+var fs = require("fs");
 
-//saving twitter keys to client variable
+//saving twitter and spotify keys to variables
 var client = new Twitter(keys.twitterKeys);
-
-//parameters
-var params = {
-    twitterParams: {
-        screen_name: 'rachel_ut_test'
-        //liri0629?
-    },
-    
-    // spotifyParams: {
-    //     type: 'track', 
-    //     value: value
-    // }
-}
+var spotify = new Spotify(keys.spotifyKeys);
 
 //search values/parameters
 var action = process.argv[2];
 var value = process.argv[3];
 
-//omdb query URL
+//parameters
+var params = {
+    twitterParams: {
+        screen_name: 'rachel_ut_test'
+    },
+    spotifyParams: {
+    	type: "track", 
+    	query: value
+    }
+}
+
+//omdb query URL and rotten tomatoes URL
 var queryUrl = "http://www.omdbapi.com/?t=" + value + "&y=&plot=short&apikey=40e9cece";
 var rottenTomatoesURL = "https://www.rottentomatoes.com/search/?search=" + value;
 
@@ -48,7 +48,7 @@ switch (action) {
     break;
 
   case "do-what-it-says":
-    //whatItSays();
+    whatItSays();
     //console.log("do-what-it-says");
     break;
 }
@@ -73,7 +73,32 @@ function showTweets(){
 
 //function to show song info (read instructions)
 function showSongInfo(){
-		console.log("show song info function working");
+		//console.log("show song info function working");
+	if (params.spotifyParams.query === undefined){
+		params.spotifyParams.query = "Bohemian Rhapsody";
+	}
+
+	spotify.search(params.spotifyParams, function(err, data) {
+	  
+	  if (value !== undefined) {
+			value = process.argv.splice(3).join(" ");
+			query = value;
+
+			//console.log(value);
+			//console.log(query);
+	  	console.log("Artist: " + data.tracks.items[0].artists[0].name);
+	  	console.log("Song Name: " + data.tracks.items[0].name);
+	  	console.log("Preview Link: " + data.tracks.items[0].href);
+	  	console.log("Album: " + data.tracks.items[0].album.name);
+	  } else if (err) {
+	  	return console.log('Error occurred: ' + err);
+	  } else {
+	  	console.log("Artist: " + data.tracks.items[0].artists[0].name);
+	  	console.log("Song Name: " + data.tracks.items[0].name);
+	  	console.log("Preview Link: " + data.tracks.items[0].href);
+	  	console.log("Album: " + data.tracks.items[0].album.name);
+	  }	 
+	});
 }
 
 //function to call movie info
@@ -107,6 +132,17 @@ function showMovieInfo(){
 	}	
 }
 //function to take the text inside of random.txt and use it to call one of LIRI's commands
-//whatItSays
+function whatItSays(){
+	fs.readFile("random.txt", "utf8", function(error, data){
 
+		if(error) {
+		  console.log("Something went wrong" + error);
+		}
+		//var dataArr = data.split(",");
+		//console.log(dataArr);
+		//value = dataArr[1];
+		//console.log(value);
+		showSongInfo();
+    });
+}
 
